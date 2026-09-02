@@ -48,6 +48,11 @@ notes. This file records important changes to *this package*.
   while seconds is id 3 and `until_failure` is id 2, so a reader counting
   positions arrived at exactly the wrong value. The docstrings of the two
   slot-entry tools, which do take an id, now state every id outright.
+* `log_set`'s docstring says to pass `rir` only when the trainee gave a number,
+  and to leave it unset when they described effort in words. A stated range is
+  numbers — record the lower bound. "Felt good" is not, and converting it
+  produces a value indistinguishable from a report once stored. `rir` was
+  already optional; nothing in the schema changes.
 
 ## 0.2.0
 
