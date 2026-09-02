@@ -19,6 +19,14 @@ notes. This file records important changes to *this package*.
   indistinguishable downstream because the number is plausible either way. An
   explicit `weight_unit` still wins, and an unreadable profile falls back to
   `kg`, so nothing fails on a transient profile error.
+* `add_exercise_with_sets` takes an optional `max_reps`, so a planned set can
+  record a rep RANGE rather than a single number. Without it, "3 x 8-12" had to
+  be stored as `8` and the top lived only in the conversation; a trainee whose
+  progression rule is "add weight once you beat the top of the range" had no
+  stored top to beat. `max_reps` below `reps` is refused before anything is
+  written, since `reps` is the bottom of the range. The `max_reps` config kind
+  already existed for `set_slot_entry_config`; this reaches it from the
+  high-level authoring call.
 
 ## 0.2.0
 
