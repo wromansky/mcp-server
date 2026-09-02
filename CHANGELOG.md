@@ -27,6 +27,27 @@ notes. This file records important changes to *this package*.
   written, since `reps` is the bottom of the range. The `max_reps` config kind
   already existed for `set_slot_entry_config`; this reaches it from the
   high-level authoring call.
+* `attach_exercise_to_slot` and `update_slot_entry` accept a unit NAME for
+  `repetition_unit` and `weight_unit` — any of the names `log_set` already took
+  — as well as wger's numeric id. Before, these were the only unit fields in the
+  server that took a bare integer with no mapping, so a caller had to know that
+  seconds is 3; `log_set` has always taken names. A wrong id is invisible
+  afterwards: a 30-second hold written with id 2 is stored as "30 until
+  failure", and nothing in the record says it was meant to be time. On these two
+  tools numeric ids still pass through unchanged, whether sent as a number or as
+  a string like `"3"`, and an unknown name is refused before the write instead
+  of reaching wger. Elsewhere — `log_set`, `update_workout_log`,
+  `set_slot_entry_config`, `add_exercise_with_sets` — the unit parameters are
+  typed `str` and have never taken a number, so a number stays refused there.
+* Unit names are matched case- and space-insensitively everywhere, so wger's own
+  display names ('Seconds', 'Until Failure') are accepted alongside the fixture
+  names.
+* The unit lists in `log_set`'s docstring and in the README are reordered to
+  match wger's actual ids and now say to pass the name rather than infer a
+  number from the list's order. As written before, they listed seconds second
+  while seconds is id 3 and `until_failure` is id 2, so a reader counting
+  positions arrived at exactly the wrong value. The docstrings of the two
+  slot-entry tools, which do take an id, now state every id outright.
 
 ## 0.2.0
 
