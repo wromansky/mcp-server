@@ -12,6 +12,13 @@ notes. This file records important changes to *this package*.
   caller reporting the plan quoted a bare rep count where the routine had
   specified a range. Unset descriptions come back as `null`, matching
   `day_name`.
+* `log_set` and `add_exercise_with_sets` take their default weight unit from
+  the trainee's own wger profile instead of a hardcoded `kg`. A profile set to
+  pounds now records pounds when the caller omits `weight_unit`; before, a
+  trainee reporting "225" had it stored as 225 kg, wrong by a factor of 2.2 and
+  indistinguishable downstream because the number is plausible either way. An
+  explicit `weight_unit` still wins, and an unreadable profile falls back to
+  `kg`, so nothing fails on a transient profile error.
 
 ## 0.2.0
 

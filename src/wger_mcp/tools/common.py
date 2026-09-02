@@ -11,6 +11,7 @@ from uuid import UUID
 
 import httpx
 from wger_api_client.api.language import language_list
+from wger_api_client.api.userprofile import userprofile_retrieve
 from wger_api_client.client import AuthenticatedClient
 from wger_api_client.errors import UnexpectedStatus
 from wger_api_client.types import UNSET, Unset
@@ -156,6 +157,33 @@ def language_id_resolver(api: AuthenticatedClient) -> Callable[[str], Awaitable[
         return cache[code]
 
     return resolve
+
+
+async def profile_weight_unit(api: AuthenticatedClient) -> str:
+    """The authenticated trainee's own weight unit, from their wger profile.
+
+    The write tools accept an explicit unit, but a caller that omits one should
+    get the unit the trainee actually works in rather than a fixed metric
+    default. A trainee whose profile says ``lb`` and who reports "225" means 225
+    pounds; storing that as 225 kilograms is wrong by a factor of 2.2, and
+    nothing downstream can tell, because the number is plausible either way.
+
+    Deliberately not cached, and not a per-registration closure: one shared
+    client serves every user (see :mod:`..api_client`), so a cache here would
+    pin the first trainee's unit onto every other trainee's writes — the same
+    silent wrong-unit write this exists to prevent, spread across users.
+
+    Any failure to read the unit falls back to ``kg``, wger's own default,
+    rather than failing the write: an unreachable profile, an undocumented
+    status, or a value the generated model refuses to parse
+    (``check_weight_unit_enum`` raises ``TypeError``).
+    """
+    try:
+        profile = await userprofile_retrieve.asyncio(client=api)
+    except (UnexpectedStatus, httpx.HTTPError, TypeError):
+        return "kg"
+    unit = getattr(profile, "weight_unit", None)
+    return unit if unit in WEIGHT_UNITS else "kg"
 
 
 def at_noon(when: date | datetime | None) -> datetime | None:
